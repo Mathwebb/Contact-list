@@ -5,10 +5,14 @@ from django.core.paginator import Paginator
 from contact.models import Contact
 
 def index(request: HttpRequest) -> HttpResponse:
-    contacts = Contact.objects.filter(show=True).order_by('-id')[:20]
+    contacts = Contact.objects.filter(show=True).order_by('-id')
+    
+    paginator = Paginator(contacts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'contacts': contacts,
+        'page_obj': page_obj,
         'page_title': 'Contatos - ',
     }
 
@@ -33,9 +37,13 @@ def search(request: HttpRequest) -> HttpResponse:
 
     if search_value == '':
         return redirect('contact:index')
+    
+    paginator = Paginator(contacts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'contacts': contacts,
+        'page_obj': page_obj,
         'page_title': 'Search - ',
         'search_value': search_value,
     }
